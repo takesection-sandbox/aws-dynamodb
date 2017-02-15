@@ -1,12 +1,8 @@
 package jp.pigumer.dynamodb
 
-import java.util.UUID
-
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 import org.specs2.mutable.Specification
-
-import scala.collection.JavaConverters._
 
 class TestRepositorySpec extends Specification {
 
@@ -24,11 +20,17 @@ class TestRepositorySpec extends Specification {
       try {
         repo.createTable.waitForActive
 
-        repo.save(UUID.randomUUID().toString, "foo")
-        repo.save(UUID.randomUUID().toString, "bar")
+        // Data 投入
+        Data.list.foreach(item => repo.save(item))
 
-        val rec = repo.findBy("test").iterator().asScala
-        rec.foreach(i => System.out.println(i.toJSON))
+        // サマリー
+        repo.sum().
+          foreach(t => {
+            val t1 = t._1
+            val t2 = t._2
+            println(s"$t1: $t2")
+          })
+
       }
       finally {
         repo.dropTable
