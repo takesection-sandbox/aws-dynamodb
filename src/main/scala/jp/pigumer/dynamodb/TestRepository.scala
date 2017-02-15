@@ -42,12 +42,12 @@ trait TestRepository {
 
   def sum(): Map[String, Int] = {
     val table = dynamoDB.getTable("test")
-    val map = new mutable.LinkedHashMap[String, Int]
-    table.scan().asScala.foreach(item => {
-      val id = item.getString("id")
-      val sum = item.getInt("count")
-      map += id -> map.get(id).map(c => c + sum).getOrElse(sum)
-    })
-    map.toMap
+    table.scan().asScala.foldLeft(new mutable.LinkedHashMap[String, Int])(
+      (map, item) => {
+        val id = item.getString("id")
+        val sum = item.getInt("count")
+        map += id -> map.get(id).map(c => c + sum).getOrElse(sum)
+      }
+    ).toMap
   }
 }
