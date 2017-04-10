@@ -1,7 +1,8 @@
 package jp.pigumer.dynamodb
 
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClient, AmazonDynamoDBClientBuilder}
 import org.specs2.mutable.Specification
 
 class TestRepositorySpec extends Specification {
@@ -9,8 +10,12 @@ class TestRepositorySpec extends Specification {
   "TestRepository" should {
 
     val client: AmazonDynamoDB = {
-      val builder = AmazonDynamoDBClientBuilder.standard()
-      builder.build()
+      val c = AmazonDynamoDBClientBuilder.
+        standard().
+        withEndpointConfiguration(
+          new EndpointConfiguration("http://localhost:8000", "ap-northeast-1")
+        )
+      c.build()
     }
 
     "test" in {
